@@ -4,7 +4,7 @@
 		header("Location : index.php");
 	}
 */
-	if ($_POST['password'] == "user" && $_POST['username'] == "pass") {
+	if ($_POST['password'] == "debian" && $_POST['username'] == "amamy") {
 		echo "You have logged in sucessfully!";
 	}
 	else {
