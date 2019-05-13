@@ -1,0 +1,126 @@
+#!/bin/sh
+SUDO_USER=$(cat /etc/passwd | grep "/home" | sed "s/:.*//g" | head -1)
+
+update()
+{
+	printf "<----- apt-get update ------>\n" | tee -a init_debian.log
+	printf "Working..."
+	apt-get update -y 1>> init_debian.log
+	printf "\nDone!\n"
+	printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+upgrade()
+{
+	printf "<----- apt-get upgrade ------>\n" | tee -a init_debian.log
+	printf "Working..."
+	apt-get upgrade -y 1>> init_debian.log
+	printf "\nDone!\n"
+	printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+sudo()
+{
+  printf "Sudo..."
+  apt-get install -y sudo 1>> init_debian.log
+  printf "Done! Confguration..." | tee -a init_debian.log
+  adduser $SUDO_USER sudo 1>> init_debian.log
+  printf "\nSudo has been installed!\n"
+  printf "$RED Sudo Configuration NEED RESTART to get effective, don't forget that point ;)$NC"
+  printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+ssh()
+{
+  printf "SSH..."
+  apt-get install -y openssh-server 1>> init_debian.log
+  printf "\nSSH has been installed!\n"
+  printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+i_git()
+{
+  printf "Git..."
+  apt-get install -y git 1>> init_debian.log
+  printf "Git has been installed!\n"
+  printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+fail2ban()
+{
+  printf "Fail2ban..."
+  apt-get install -y fail2ban 1>> init_debian.log
+  printf "Fail2ban has been installed!\n"
+  printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+php()
+{
+  printf "Fail2ban..."
+  apt-get install -y php7.0 php7.0-mysql 1>> init_debian.log
+  printf "PHP has been installed!\n"
+  printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+apache()
+{
+  printf "Apache..."
+  apt-get install -y apache2 libapache2-mod-php7.0 1>> init_debian.log
+  printf "PHP has been installed!\n"
+  printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+psad()
+{
+  printf "PSAD..."
+  apt-get install -y psad 1>> init_debian.log
+  printf "PSAD has been installed!\n"
+  printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+build_essential()
+{
+  printf "Build-essential..."
+  apt-get install -y build-essential 1>> init_debian.log
+  printf "Build-essential has been installed!\n"
+  printf "<----------->\n\n" | tee -a init_debian.log
+}
+
+tools_installation()
+{
+update
+upgrade
+build_essential
+network
+sudo
+ssh
+i_git
+fail2ban
+php
+apache
+psad
+}
+
+setting_up()
+{
+	printf "Setting up...\n"
+	git clone https://github.com/TaKouMyS/RS1.git
+	cd RS1
+	cp conf/interfaces /etc/network/
+	cp conf/sshd_config /etc/ssh/
+	mkdir /home/amamy/.ssh
+	cp conf/amamy_ssh.pub /home/amamy/.ssh
+	cp conf/authorized_keys /home/amamy/.ssh
+	cp conf/iptables.rules /etc/
+	iptables-restore < /etc/iptables.rules
+	cp conf/jail.local /etc/fail2ban/
+	cp conf/http-get-dos.conf /etc/fail2ban/filters.d
+	cp conf/psad.conf /etc/psad/
+	cp conf/root /var/spool/cron/crontabs/
+	printf "Done!\n"
+}
+
+tools_installation
+setting_up
+printf "The system will now reboot.\n"
+#reboot
